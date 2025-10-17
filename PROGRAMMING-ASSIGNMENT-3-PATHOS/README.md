@@ -69,7 +69,7 @@ Each line in the output describes a single mapped 4KB page:
   * **`pte`**: The raw 32-bit Page Table Entry containing the `pa` and `perm` bits.
   * **`perm`**: The lower bits of the PTE, which define the access permissions. For `0x3e`, this indicates the page is a valid, cacheable, bufferable page with User Read/Write access.
 
------
+
 
 ## Part 2: On-Demand Paging
 
@@ -99,7 +99,7 @@ On-demand paging test passed!
 
 The "Success\!" message confirms that the kernel caught the page fault, allocated a page, and returned control to the program without panicking, proving the implementation is correct.
 
------
+
 
 ## Core Implementation & Challenges
 
@@ -152,7 +152,7 @@ Even after all C code was correct, the system still hung silently after a page f
 
 This final change fixed the kernel hang and allowed the entire system to work correctly, demonstrating a complete and robust on-demand paging implementation.
 
------
+
 
 ## How to Build and Run
 
