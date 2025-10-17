@@ -1,91 +1,97 @@
-# xv6-pi5 Documentation
+# Programming Assignment 1: xv6 System Enhancements
 
-## Overview
-xv6-pi5 is a port of the MIT xv6 teaching operating system to the ARM architecture, with a focus on compatibility with the Raspberry Pi 5 platform. It provides a minimal Unix-like kernel, shell, file system, and basic user programs, serving as a hands-on resource for learning operating system fundamentals on ARM hardware.
+---
 
-## Repository Structure
-| Path/Directory | Purpose |
-|----------------|---------|
-| `arm.c`, `arm.h` | ARM CPU initialization, context switching, MMU setup |
-| `asm.S` | Assembly routines for low-level CPU and trap handling |
-| `entry.S` | Kernel entry point and bootstrap code |
-| `swtch.S` | Context switch (process switching) assembly routine |
-| `trap_asm.S` | Trap and interrupt entry assembly |
-| `mmu.h` | ARM MMU and paging definitions |
-| `kernel.ld` | Linker script for ARM memory layout |
-| `initcode.S` | Minimal user-mode program for system initialization |
-| `device/` | Device drivers (UART, timer, interrupt controller, etc.) |
-| `console.c` | Console (UART) driver and kernel I/O |
-| `main.c`, `start.c` | Kernel initialization and main loop |
-| `Makefile` | Build system configuration for ARM toolchain |
-| `usr/` | User programs (e.g., sh, ls, cat, etc.) |
-| `tools/` | Build utilities (e.g., mkfs for file system creation) |
-| Other `.c`/`.h` | Core kernel subsystems (proc, vm, file system, etc.) |
+## Introduction
 
-## Getting Started
+For this programming assignment, we will delve into the **xv6 operating system** to add several new functionalities. This will provide hands-on experience with kernel-level programming, system calls, and process management.
 
-### Prerequisites
-- **ARM GCC Toolchain**: `arm-none-eabi-gcc` (for ARMv6/ARMv7) or `aarch64-linux-gnu-gcc` (for ARMv8/AArch64, Pi 5).
-- **QEMU**: For ARM system emulation and testing.
-- **Make**: Standard build utility.
+---
 
-### Building xv6-pi5
-1. **Clone the Repository**:
-   ```bash
-   git clone -b xv6-pi5 https://github.com/bobbysharma05/OS.git
-   cd OS/src
-   ```
-2. **Build the Kernel and User Programs**:
-   ```bash
-   make clean
-   make
-   ```
-3. **Run in QEMU**:
-   ```bash
-   qemu-system-arm -M versatilepb -m 128 -cpu arm1176 -nographic -kernel kernel.elf
-   ```
-   You should see the xv6 shell prompt: `$`
+## Setup & Tools
 
-## Features
-- **Minimal Unix-like Kernel**: Process management, virtual memory, system calls.
-- **ARM Support**: All low-level CPU, trap, and MMU code adapted for ARM.
-- **Shell and Userland**: Simple shell and standard Unix utilities (ls, cat, echo, etc.).
-- **File System**: xv6-style file system with support for basic file operations.
-- **UART Console**: Serial console for kernel and shell I/O.
-- **QEMU Compatibility**: Easily testable in QEMU before deploying to hardware.
+Before you begin, you will need to download the xv6 source code and install the necessary tools to build and run the operating system.
 
-## Key ARM-Specific Components
-- **CPU and MMU Initialization**: Implemented in `arm.c`, `arm.h`, `mmu.h`, and associated assembly files. Handles setting up the ARM page tables, enabling the MMU, and configuring CPU modes.
-- **Trap and Interrupt Handling**: Assembly files (`asm.S`, `trap_asm.S`, `entry.S`) provide the trap vector and interrupt entry points. Kernel C code handles dispatch and processing.
-- **UART/Console**: `console.c` and device drivers in `device/` configure and use the Raspberry Pi’s UART for boot and shell interaction.
-- **Linker Script**: `kernel.ld` ensures the kernel is loaded at the correct physical address for ARM.
+### Required Tools
+* **ARM GCC Toolchain:** `arm-none-eabi-gcc`
+* **QEMU:** For ARM system emulation and testing.
+* **GNU-MAKE:** A build utility.
 
-## Porting Notes
-- **Architecture-Specific Files**: All files related to CPU initialization, assembly, MMU, and device drivers are ARM-specific and differ from the x86/RISC-V versions of xv6.
-- **Build System**: The `Makefile` and build scripts are set up for ARM toolchains. Adjust toolchain paths if necessary for your environment.
-- **Testing**: QEMU is used for initial bring-up. For real Raspberry Pi 5 hardware, further adaptation (especially for new peripherals) may be required.
+### Running xv6
+Once the tools are installed and you have extracted the code tarball, run the following commands from your terminal to compile and boot the OS in the QEMU emulator:
 
-## Usage Example
 ```bash
-$ ls
-.              1 1 512
-..             1 1 512
-cat            2 2 8620
-echo           2 3 8340
-grep           2 4 9528
-init           2 5 8560
-kill           2 6 8332
-ln             2 7 8364
-ls             2 8 9332
-mkdir          2 9 8412
-rm             2 10 8404
-sh             2 11 13532
-stressfs       2 12 8616
-usertests      2 13 32956
-wc             2 14 8904
-zombie         2 15 8184
-UNIX           2 16 7828
-console        3 17 0
+prompt> make clean
+prompt> make qemu
+````
+
+If everything is set up correctly, you should see the xv6 shell prompt:
+
+```
+xv6 kernel is booting
+hart 2 starting
+hart 1 starting
+init: starting sh
 $
 ```
-This demonstrates a successful boot, shell launch, and file system access.
+
+You can run `ls` to see a list of available user programs in the starter OS.
+
+-----
+
+## Important Files
+
+Take some time to familiarize yourself with the xv6 codebase. Here are some of the most relevant files for this assignment:
+
+  * `user.h`: Contains the user-space definitions for system calls.
+  * `usys.S`: Assembly code that handles the transition from user mode to kernel mode for system calls.
+  * `syscall.h`: Maps system call names to their corresponding numbers.
+  * `syscall.c`: Contains the kernel-side dispatcher for system calls.
+  * `sysproc.c`: Contains kernel-level implementations for process-related system calls.
+  * `defs.h`: A header file with function definitions used throughout the kernel.
+  * `proc.h`: Defines the `struct proc` and other process-related structures.
+  * `proc.c`: Implements process management functionalities, including the scheduler and process table traversal logic.
+
+-----
+
+## Tasks to Complete
+
+You are required to implement the following features and commands.
+
+### 1\. `uptime` Command (2 pts.)
+
+Create a new user-level program named `uptime`. When executed from the xv6 shell, this command should print the total time the system has been running.
+
+### 2\. `pause` Command (3 pts.)
+
+Implement a `pause` command that suspends its own execution for a specified number of seconds.
+
+  * **Create the file** `user/pause.c`. You can reference other programs in the `user/` directory (e.g., `echo.c`, `grep.c`) as examples for handling command-line arguments.
+  * **Add your program** to the `UPROGS` variable in the `Makefile` so it gets compiled.
+  * **Argument Handling:**
+      * The program should accept one command-line argument: the number of seconds to pause.
+      * If the user does not provide an argument, the program should print an error message to the console.
+      * The command-line argument is passed as a string; use the provided `atoi` function (in `user/ulib.c`) to convert it to an integer.
+  * **Implementation:** Use the existing `sleep` system call to implement the pause functionality.
+  * **Exit Gracefully:** The `main` function of your `pause` program should call `exit(0)` upon completion.
+
+### 3\. Shell Tab Completion (3 pts.)
+
+Modify the xv6 shell (`sh`) to support **tab completion**. When the user presses the `Tab` key:
+
+  * If the partially typed command is unique, the shell should complete the command name automatically.
+  * If the partial text matches multiple commands, the shell should list all possible completions.
+
+### 4\. `ps` Command (4 pts.)
+
+Implement a `ps` (process status) command that displays details for all processes currently running on the system. You will likely need to implement one or more new system calls to retrieve the necessary information from the kernel.
+
+The output for each process should include the following fields:
+
+  * **Process ID (PID)**
+  * **Parent's Process ID (PPID)**
+  * **Process Name**
+  * **Process State** (e.g., running, sleeping, zombie)
+  * **System Call Count:** The total number of system calls the process has invoked since it started.
+
+<!-- end list -->
