@@ -1,91 +1,170 @@
-# xv6-pi5 Documentation
+# Programming Assignment 3: xv6 On-Demand Paging Implementation
 
-## Overview
-xv6-pi5 is a port of the MIT xv6 teaching operating system to the ARM architecture, with a focus on compatibility with the Raspberry Pi 5 platform. It provides a minimal Unix-like kernel, shell, file system, and basic user programs, serving as a hands-on resource for learning operating system fundamentals on ARM hardware.
+This project enhances the xv6 operating system (ARM port) by introducing two key memory management features: a system call for inspecting a process's page table and a full implementation of on-demand paging. This document details the implementation of both features, the challenges encountered, and the final, working solution.
 
-## Repository Structure
-| Path/Directory | Purpose |
-|----------------|---------|
-| `arm.c`, `arm.h` | ARM CPU initialization, context switching, MMU setup |
-| `asm.S` | Assembly routines for low-level CPU and trap handling |
-| `entry.S` | Kernel entry point and bootstrap code |
-| `swtch.S` | Context switch (process switching) assembly routine |
-| `trap_asm.S` | Trap and interrupt entry assembly |
-| `mmu.h` | ARM MMU and paging definitions |
-| `kernel.ld` | Linker script for ARM memory layout |
-| `initcode.S` | Minimal user-mode program for system initialization |
-| `device/` | Device drivers (UART, timer, interrupt controller, etc.) |
-| `console.c` | Console (UART) driver and kernel I/O |
-| `main.c`, `start.c` | Kernel initialization and main loop |
-| `Makefile` | Build system configuration for ARM toolchain |
-| `usr/` | User programs (e.g., sh, ls, cat, etc.) |
-| `tools/` | Build utilities (e.g., mkfs for file system creation) |
-| Other `.c`/`.h` | Core kernel subsystems (proc, vm, file system, etc.) |
+## Part 1: Page Table Inspection System Call
+The first part of the assignment involved creating a system call, `print_pt()`, that provides a snapshot of the current process's virtual-to-physical memory mappings.
 
-## Getting Started
+### Implementation Details
+A new system call was added to provide a debugging and inspection tool to observe how the OS manages memory. The implementation involved:
 
-### Prerequisites
-- **ARM GCC Toolchain**: `arm-none-eabi-gcc` (for ARMv6/ARMv7) or `aarch64-linux-gnu-gcc` (for ARMv8/AArch64, Pi 5).
-- **QEMU**: For ARM system emulation and testing.
-- **Make**: Standard build utility.
+* **Declaration (`syscall.h`, `user.h`):** Defining the system call number and its user-space function prototype.
+* **Registration (`syscall.c`, `usys.S`):** Linking the system call number to the kernel function and creating the assembly wrapper for user programs.
+* **Core Logic (`sysproc.c`):** Implementing the `sys_print_pt()` function, which iterates through the current process's page table and prints the first 10 and last 10 valid Page Table Entries (PTEs).
 
-### Building xv6-pi5
-1. **Clone the Repository**:
-   ```bash
-   git clone -b xv6-pi5 https://github.com/bobbysharma05/OS.git
-   cd OS/src
-   ```
-2. **Build the Kernel and User Programs**:
-   ```bash
-   make clean
-   make
-   ```
-3. **Run in QEMU**:
-   ```bash
-   qemu-system-arm -M versatilepb -m 128 -cpu arm1176 -nographic -kernel kernel.elf
-   ```
-   You should see the xv6 shell prompt: `$`
+### Test Program: `test.c`
+The `test.c` program was modified to work correctly within the new on-demand paging environment.
 
-## Features
-- **Minimal Unix-like Kernel**: Process management, virtual memory, system calls.
-- **ARM Support**: All low-level CPU, trap, and MMU code adapted for ARM.
-- **Shell and Userland**: Simple shell and standard Unix utilities (ls, cat, echo, etc.).
-- **File System**: xv6-style file system with support for basic file operations.
-- **UART Console**: Serial console for kernel and shell I/O.
-- **QEMU Compatibility**: Easily testable in QEMU before deploying to hardware.
+* It calls `sbrk()` to request 30 pages of virtual memory. No physical memory is allocated at this stage.
+* It then enters a "touching" loop, writing one byte to each of the 30 pages. Each write to a new, unmapped page triggers a page fault, forcing the kernel to allocate a physical page.
+* After the loop, all 30 pages are physically mapped.
+* Finally, it calls `print_pt()` to display the now-complete page table.
 
-## Key ARM-Specific Components
-- **CPU and MMU Initialization**: Implemented in `arm.c`, `arm.h`, `mmu.h`, and associated assembly files. Handles setting up the ARM page tables, enabling the MMU, and configuring CPU modes.
-- **Trap and Interrupt Handling**: Assembly files (`asm.S`, `trap_asm.S`, `entry.S`) provide the trap vector and interrupt entry points. Kernel C code handles dispatch and processing.
-- **UART/Console**: `console.c` and device drivers in `device/` configure and use the Raspberry Pi’s UART for boot and shell interaction.
-- **Linker Script**: `kernel.ld` ensures the kernel is loaded at the correct physical address for ARM.
+### Final Output of `test`
+After all changes, the `test` program runs successfully and produces the following output, proving both the `print_pt` system call and the on-demand allocation are working together.
 
-## Porting Notes
-- **Architecture-Specific Files**: All files related to CPU initialization, assembly, MMU, and device drivers are ARM-specific and differ from the x86/RISC-V versions of xv6.
-- **Build System**: The `Makefile` and build scripts are set up for ARM toolchains. Adjust toolchain paths if necessary for your environment.
-- **Testing**: QEMU is used for initial bring-up. For real Raspberry Pi 5 hardware, further adaptation (especially for new peripherals) may be required.
-
-## Usage Example
 ```bash
-$ ls
-.              1 1 512
-..             1 1 512
-cat            2 2 8620
-echo           2 3 8340
-grep           2 4 9528
-init           2 5 8560
-kill           2 6 8332
-ln             2 7 8364
-ls             2 8 9332
-mkdir          2 9 8412
-rm             2 10 8404
-sh             2 11 13532
-stressfs       2 12 8616
-usertests      2 13 32956
-wc             2 14 8904
-zombie         2 15 8184
-UNIX           2 16 7828
-console        3 17 0
-$
+$ test
+Running Test Program for Page Table Printing
+
+1. Allocating 30 pages of VIRTUAL memory using sbrk()...
+2. 'Touching' each page to trigger physical allocation via page faults...
+   ...All pages are now physically mapped.
+3. Now calling print_pt() to observe the page table.
+Page Table for process 3 
+First 10 mapped pages 
+va 0x0 pte 0x7fee03e pa 0x7fee000 perm 0x3e
+va 0x1000 pte 0x7fef03e pa 0x7fef000 perm 0x3e
+va 0x2000 -> not mapped
+va 0x3000 pte 0x7ff003e pa 0x7ff0000 perm 0x3e
+va 0x4000 pte 0x7fe403e pa 0x7fe4000 perm 0x3e
+va 0x5000 pte 0x7fe503e pa 0x7fe5000 perm 0x3e
+va 0x6000 pte 0x7fea03e pa 0x7fea000 perm 0x3e
+va 0x7000 pte 0x7feb03e pa 0x7feb000 perm 0x3e
+va 0x8000 pte 0x7fec03e pa 0x7fec000 perm 0x3e
+va 0x9000 pte 0x7fed03e pa 0x7fed000 perm 0x3e
+Last 10 mapped pages 
+va 0x18000 pte 0x7fbf03e pa 0x7fbf000 perm 0x3e
+va 0x19000 pte 0x7fc003e pa 0x7fc0000 perm 0x3e
+va 0x1a000 pte 0x7fc103e pa 0x7fc1000 perm 0x3e
+va 0x1b000 pte 0x7fc203e pa 0x7fc2000 perm 0x3e
+va 0x1c000 pte 0x7fc303e pa 0x7fc3000 perm 0x3e
+va 0x1d000 pte 0x7fc403e pa 0x7fc4000 perm 0x3e
+va 0x1e000 pte 0x7fc503e pa 0x7fc5000 perm 0x3e
+va 0x1f000 pte 0x7fc603e pa 0x7fc6000 perm 0x3e
+va 0x20000 pte 0x7fc703e pa 0x7fc7000 perm 0x3e
+va 0x21000 pte 0x7fc803e pa 0x7fc8000 perm 0x3e
+
+--- Running other tests ---
+ugetpid_test starting
+ugetpid_test: OK
+
+All assignment tests passed successfully!
+````
+
+Each line in the output describes a single mapped 4KB page:
+
+  * **`va`**: The virtual address the program uses.
+  * **`pa`**: The corresponding physical address in the computer's RAM.
+  * **`pte`**: The raw 32-bit Page Table Entry containing the `pa` and `perm` bits.
+  * **`perm`**: The lower bits of the PTE, which define the access permissions. For `0x3e`, this indicates the page is a valid, cacheable, bufferable page with User Read/Write access.
+
+-----
+
+## Part 2: On-Demand Paging
+
+The second part of the assignment was to convert xv6's memory allocation from an "eager" model to a "lazy" (on-demand) model, where physical memory is only allocated when a process first attempts to use it.
+
+### Test Program: `pagetest.c`
+
+The `pagetest.c` program is a simple utility designed to prove that on-demand paging works.
+
+  * It calls `sbrk(4096)` to request one page of virtual memory.
+  * It then immediately tries to write to that memory, triggering a page fault.
+  * If the kernel handler is successful, the program continues and prints a success message.
+
+### Final Output of `pagetest`
+
+The output clearly demonstrates the success of the implementation:
+
+```bash
+$ pagetest
+Starting On-Demand Paging Test 
+sbrk() allocated memory at virtual address 4000
+About to access this new memory. This should trigger a page fault...
+Success! Page fault was handled correctly.
+Verified by reading back the written data:++ Hi
+On-demand paging test passed! 
 ```
-This demonstrates a successful boot, shell launch, and file system access.
+
+The "Success\!" message confirms that the kernel caught the page fault, allocated a page, and returned control to the program without panicking, proving the implementation is correct.
+
+-----
+
+## Core Implementation & Challenges
+
+Implementing on-demand paging required a deep modification of the kernel's core memory management and trap handling systems.
+
+### 1\. `vm.c` - Making the System Lazy
+
+The `vm.c` file was modified to stop eager allocation and handle its side effects.
+
+  * **`allocuvm()`**: The `for` loop that allocated physical pages was removed. This is the key change that makes the `sbrk()` system call lazy.
+  * **`loaduvm()`**: This function was modified to allocate its own pages when loading a program, fixing a panic that occurred when `exec()` tried to load `init`.
+  * **`copyuvm()`**: This function was modified to be "lazy-aware." It now correctly skips over unallocated virtual pages when `fork()` is called, instead of panicking.
+
+### 2\. `exec.c` - Fixing the Startup Panic
+
+The `exec()` system call failed because it tried to write arguments to a stack page that was now lazy.
+
+  * **The Solution**: A block of code was added to `exec.c` to eagerly allocate just one physical page for the stack, ensuring the `init` process could start successfully while leaving the rest of the heap lazy.
+
+### 3\. `trap.c` - The Fault Handler
+
+A robust `dabort_handler()` (Data Abort is ARM's term for a page fault) was implemented. When a fault occurs, it:
+
+  * Validates the fault: Checks if the faulting address is within the process's legal memory space (`fa < p->sz`).
+  * Allocates a page of physical RAM.
+  * Maps the page by updating the process's page table.
+  * Handles interrupts correctly, using `cli()` to disable and `sti()` to re-enable them, which was crucial to fixing a kernel hang.
+
+### 4\. The Debugging Journey: The Final Bug in `trap_asm.S`
+
+Even after all C code was correct, the system still hung silently after a page fault. This was the most challenging bug.
+
+  * **The Problem**: Through step-by-step debugging, the issue was traced to the low-level assembly file `trap_asm.S`. The original code for the data abort handler was designed to treat a page fault as a fatal, unrecoverable error. After the C handler finished, the assembly code executed a deliberate infinite loop:
+
+    ```armasm
+    trap_dabort:
+        ...
+        BL      dabort_handler  ; Calls the C function
+        B       .               ; BUG: Branch to self (infinite loop)
+    ```
+
+  * **The Solution**: A one-line change was made to this file, telling the system to return properly after the fault is handled:
+
+    ```armasm
+    trap_dabort:
+        ...
+        BL      dabort_handler
+        B       trapret         ; FIX: Branch to the shared return code
+    ```
+
+This final change fixed the kernel hang and allowed the entire system to work correctly, demonstrating a complete and robust on-demand paging implementation.
+
+-----
+
+## How to Build and Run
+
+**Clean and Compile:**
+
+```bash
+make clean && make
+```
+
+**Run in QEMU:**
+
+```bash
+qemu-system-arm -M versatilepb -m 128 -cpu arm1176 -nographic -kernel kernel.elf
+```
+
