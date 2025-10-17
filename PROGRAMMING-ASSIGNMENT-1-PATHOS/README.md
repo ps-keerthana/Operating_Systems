@@ -1,12 +1,12 @@
 # Programming Assignment 1: xv6 System Enhancements
 
----
+
 
 ## Introduction
 
 For this programming assignment, we will delve into the **xv6 operating system** to add several new functionalities. This will provide hands-on experience with kernel-level programming, system calls, and process management.
 
----
+
 
 ## Setup & Tools
 
@@ -37,7 +37,7 @@ $
 
 You can run `ls` to see a list of available user programs in the starter OS.
 
------
+
 
 ## Important Files
 
@@ -52,7 +52,7 @@ Take some time to familiarize yourself with the xv6 codebase. Here are some of t
   * `proc.h`: Defines the `struct proc` and other process-related structures.
   * `proc.c`: Implements process management functionalities, including the scheduler and process table traversal logic.
 
------
+
 
 ## Tasks to Complete
 
