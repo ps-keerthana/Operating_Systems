@@ -283,7 +283,7 @@ Both the other threads have printed by now
 
 ## Final Status and Conclusion
 
-All parts of the assignment—Barriers, Threads, User-space Locks, Condition Variables, and Semaphores—have been implemented and passed the provided test cases, demonstrating correct synchronization and concurrency behavior in the modified xv6 kernel.
+All parts of the assignment Barriers, Threads, User-space Locks, Condition Variables, and Semaphores—have been implemented and passed the provided test cases, demonstrating correct synchronization and concurrency behavior in the modified xv6 kernel.
 
 
 
