@@ -1,0 +1,196 @@
+  CC       build/lib/string.o
+  CC       build/arm.o
+  AS       build/asm.o
+  CC       build/bio.o
+  CC       build/buddy.o
+  CC       build/console.o
+  CC       build/exec.o
+  CC       build/file.o
+  CC       build/fs.o
+  CC       build/log.o
+  CC       build/main.o
+  CC       build/memide.o
+  CC       build/pipe.o
+  CC       build/proc.o
+  CC       build/spinlock.o
+  CC       build/start.o
+  AS       build/swtch.o
+  CC       build/syscall.o
+  CC       build/sysfile.o
+  CC       build/sysproc.o
+  AS       build/trap_asm.o
+  CC       build/trap.o
+  CC       build/vm.o
+  CC       build/barrier.o
+  CC       build/device/picirq.o
+  CC       build/device/timer.o
+  CC       build/device/uart.o
+  AS       build/entry.o
+  AS       build/initcode.o
+  LINK     build/initcode
+  OBJCOPY  build/initcode
+arm-none-eabi-objdump -S build/initcode.o > initcode.asm
+make -C tools
+make[1]: Entering directory '/mnt/c/Users/dhrut/Downloads/programming-assignment-5-pathos/OS/tools'
+gcc -Werror -Wall -iquote ../ -o mkfs mkfs.c
+make[1]: Leaving directory '/mnt/c/Users/dhrut/Downloads/programming-assignment-5-pathos/OS/tools'
+make -C usr
+make[1]: Entering directory '/mnt/c/Users/dhrut/Downloads/programming-assignment-5-pathos/OS/usr'
+arm-none-eabi-gcc -march=armv6 -fno-pic -static -fno-builtin -fno-strict-aliasing -Wall -Werror -I. -iquote ../   -c -o ulib.o ulib.c
+/tmp/ccdVsw4u.s: Assembler messages:
+/tmp/ccdVsw4u.s:684: swp{b} use is deprecated for ARMv6 and ARMv7
+arm-none-eabi-gcc -march=armv6 -I ../   -c -o usys.o usys.S
+arm-none-eabi-gcc -march=armv6 -fno-pic -static -fno-builtin -fno-strict-aliasing -Wall -Werror -I. -iquote ../   -c -o printf.o printf.c
+arm-none-eabi-gcc -march=armv6 -fno-pic -static -fno-builtin -fno-strict-aliasing -Wall -Werror -I. -iquote ../   -c -o umalloc.o umalloc.c
+arm-none-eabi-gcc -march=armv6 -fno-pic -static -fno-builtin -fno-strict-aliasing -Wall -Werror -I. -iquote ../   -c -o cat.o cat.c
+arm-none-eabi-ld -L. -N -e main -Ttext 0 -o _cat cat.o ulib.o usys.o printf.o umalloc.o  -L ../ /usr/lib/gcc/arm-none-eabi/13.2.1/libgcc.a
+arm-none-eabi-objdump -S _cat > cat.asm
+arm-none-eabi-objdump -t _cat | sed '1,/SYMBOL TABLE/d; s/ .* / /; /^$/d' > cat.sym
+arm-none-eabi-gcc -march=armv6 -fno-pic -static -fno-builtin -fno-strict-aliasing -Wall -Werror -I. -iquote ../   -c -o echo.o echo.c
+arm-none-eabi-ld -L. -N -e main -Ttext 0 -o _echo echo.o ulib.o usys.o printf.o umalloc.o  -L ../ /usr/lib/gcc/arm-none-eabi/13.2.1/libgcc.a
+arm-none-eabi-objdump -S _echo > echo.asm
+arm-none-eabi-objdump -t _echo | sed '1,/SYMBOL TABLE/d; s/ .* / /; /^$/d' > echo.sym
+arm-none-eabi-gcc -march=armv6 -fno-pic -static -fno-builtin -fno-strict-aliasing -Wall -Werror -I. -iquote ../   -c -o grep.o grep.c
+arm-none-eabi-ld -L. -N -e main -Ttext 0 -o _grep grep.o ulib.o usys.o printf.o umalloc.o  -L ../ /usr/lib/gcc/arm-none-eabi/13.2.1/libgcc.a
+arm-none-eabi-objdump -S _grep > grep.asm
+arm-none-eabi-objdump -t _grep | sed '1,/SYMBOL TABLE/d; s/ .* / /; /^$/d' > grep.sym
+arm-none-eabi-gcc -march=armv6 -fno-pic -static -fno-builtin -fno-strict-aliasing -Wall -Werror -I. -iquote ../   -c -o init.o init.c
+arm-none-eabi-ld -L. -N -e main -Ttext 0 -o _init init.o ulib.o usys.o printf.o umalloc.o  -L ../ /usr/lib/gcc/arm-none-eabi/13.2.1/libgcc.a
+arm-none-eabi-objdump -S _init > init.asm
+arm-none-eabi-objdump -t _init | sed '1,/SYMBOL TABLE/d; s/ .* / /; /^$/d' > init.sym
+arm-none-eabi-gcc -march=armv6 -fno-pic -static -fno-builtin -fno-strict-aliasing -Wall -Werror -I. -iquote ../   -c -o kill.o kill.c
+arm-none-eabi-ld -L. -N -e main -Ttext 0 -o _kill kill.o ulib.o usys.o printf.o umalloc.o  -L ../ /usr/lib/gcc/arm-none-eabi/13.2.1/libgcc.a
+arm-none-eabi-objdump -S _kill > kill.asm
+arm-none-eabi-objdump -t _kill | sed '1,/SYMBOL TABLE/d; s/ .* / /; /^$/d' > kill.sym
+arm-none-eabi-gcc -march=armv6 -fno-pic -static -fno-builtin -fno-strict-aliasing -Wall -Werror -I. -iquote ../   -c -o ln.o ln.c
+arm-none-eabi-ld -L. -N -e main -Ttext 0 -o _ln ln.o ulib.o usys.o printf.o umalloc.o  -L ../ /usr/lib/gcc/arm-none-eabi/13.2.1/libgcc.a
+arm-none-eabi-objdump -S _ln > ln.asm
+arm-none-eabi-objdump -t _ln | sed '1,/SYMBOL TABLE/d; s/ .* / /; /^$/d' > ln.sym
+arm-none-eabi-gcc -march=armv6 -fno-pic -static -fno-builtin -fno-strict-aliasing -Wall -Werror -I. -iquote ../   -c -o ls.o ls.c
+arm-none-eabi-ld -L. -N -e main -Ttext 0 -o _ls ls.o ulib.o usys.o printf.o umalloc.o  -L ../ /usr/lib/gcc/arm-none-eabi/13.2.1/libgcc.a
+arm-none-eabi-objdump -S _ls > ls.asm
+arm-none-eabi-objdump -t _ls | sed '1,/SYMBOL TABLE/d; s/ .* / /; /^$/d' > ls.sym
+arm-none-eabi-gcc -march=armv6 -fno-pic -static -fno-builtin -fno-strict-aliasing -Wall -Werror -I. -iquote ../   -c -o mkdir.o mkdir.c
+arm-none-eabi-ld -L. -N -e main -Ttext 0 -o _mkdir mkdir.o ulib.o usys.o printf.o umalloc.o  -L ../ /usr/lib/gcc/arm-none-eabi/13.2.1/libgcc.a
+arm-none-eabi-objdump -S _mkdir > mkdir.asm
+arm-none-eabi-objdump -t _mkdir | sed '1,/SYMBOL TABLE/d; s/ .* / /; /^$/d' > mkdir.sym
+arm-none-eabi-gcc -march=armv6 -fno-pic -static -fno-builtin -fno-strict-aliasing -Wall -Werror -I. -iquote ../   -c -o rm.o rm.c
+arm-none-eabi-ld -L. -N -e main -Ttext 0 -o _rm rm.o ulib.o usys.o printf.o umalloc.o  -L ../ /usr/lib/gcc/arm-none-eabi/13.2.1/libgcc.a
+arm-none-eabi-objdump -S _rm > rm.asm
+arm-none-eabi-objdump -t _rm | sed '1,/SYMBOL TABLE/d; s/ .* / /; /^$/d' > rm.sym
+arm-none-eabi-gcc -march=armv6 -fno-pic -static -fno-builtin -fno-strict-aliasing -Wall -Werror -I. -iquote ../   -c -o sh.o sh.c
+arm-none-eabi-ld -L. -N -e main -Ttext 0 -o _sh sh.o ulib.o usys.o printf.o umalloc.o  -L ../ /usr/lib/gcc/arm-none-eabi/13.2.1/libgcc.a
+arm-none-eabi-objdump -S _sh > sh.asm
+arm-none-eabi-objdump -t _sh | sed '1,/SYMBOL TABLE/d; s/ .* / /; /^$/d' > sh.sym
+arm-none-eabi-gcc -march=armv6 -fno-pic -static -fno-builtin -fno-strict-aliasing -Wall -Werror -I. -iquote ../   -c -o stressfs.o stressfs.c
+arm-none-eabi-ld -L. -N -e main -Ttext 0 -o _stressfs stressfs.o ulib.o usys.o printf.o umalloc.o  -L ../ /usr/lib/gcc/arm-none-eabi/13.2.1/libgcc.a
+arm-none-eabi-objdump -S _stressfs > stressfs.asm
+arm-none-eabi-objdump -t _stressfs | sed '1,/SYMBOL TABLE/d; s/ .* / /; /^$/d' > stressfs.sym
+arm-none-eabi-gcc -march=armv6 -fno-pic -static -fno-builtin -fno-strict-aliasing -Wall -Werror -I. -iquote ../   -c -o usertests.o usertests.c
+arm-none-eabi-ld -L. -N -e main -Ttext 0 -o _usertests usertests.o ulib.o usys.o printf.o umalloc.o  -L ../ /usr/lib/gcc/arm-none-eabi/13.2.1/libgcc.a
+arm-none-eabi-objdump -S _usertests > usertests.asm
+arm-none-eabi-objdump -t _usertests | sed '1,/SYMBOL TABLE/d; s/ .* / /; /^$/d' > usertests.sym
+arm-none-eabi-gcc -march=armv6 -fno-pic -static -fno-builtin -fno-strict-aliasing -Wall -Werror -I. -iquote ../   -c -o wc.o wc.c
+arm-none-eabi-ld -L. -N -e main -Ttext 0 -o _wc wc.o ulib.o usys.o printf.o umalloc.o  -L ../ /usr/lib/gcc/arm-none-eabi/13.2.1/libgcc.a
+arm-none-eabi-objdump -S _wc > wc.asm
+arm-none-eabi-objdump -t _wc | sed '1,/SYMBOL TABLE/d; s/ .* / /; /^$/d' > wc.sym
+arm-none-eabi-gcc -march=armv6 -fno-pic -static -fno-builtin -fno-strict-aliasing -Wall -Werror -I. -iquote ../   -c -o zombie.o zombie.c
+arm-none-eabi-ld -L. -N -e main -Ttext 0 -o _zombie zombie.o ulib.o usys.o printf.o umalloc.o  -L ../ /usr/lib/gcc/arm-none-eabi/13.2.1/libgcc.a
+arm-none-eabi-objdump -S _zombie > zombie.asm
+arm-none-eabi-objdump -t _zombie | sed '1,/SYMBOL TABLE/d; s/ .* / /; /^$/d' > zombie.sym
+arm-none-eabi-gcc -march=armv6 -fno-pic -static -fno-builtin -fno-strict-aliasing -Wall -Werror -I. -iquote ../   -c -o uptime.o uptime.c
+arm-none-eabi-ld -L. -N -e main -Ttext 0 -o _uptime uptime.o ulib.o usys.o printf.o umalloc.o  -L ../ /usr/lib/gcc/arm-none-eabi/13.2.1/libgcc.a
+arm-none-eabi-objdump -S _uptime > uptime.asm
+arm-none-eabi-objdump -t _uptime | sed '1,/SYMBOL TABLE/d; s/ .* / /; /^$/d' > uptime.sym
+arm-none-eabi-gcc -march=armv6 -fno-pic -static -fno-builtin -fno-strict-aliasing -Wall -Werror -I. -iquote ../   -c -o pause.o pause.c
+arm-none-eabi-ld -L. -N -e main -Ttext 0 -o _pause pause.o ulib.o usys.o printf.o umalloc.o  -L ../ /usr/lib/gcc/arm-none-eabi/13.2.1/libgcc.a
+arm-none-eabi-objdump -S _pause > pause.asm
+arm-none-eabi-objdump -t _pause | sed '1,/SYMBOL TABLE/d; s/ .* / /; /^$/d' > pause.sym
+arm-none-eabi-gcc -march=armv6 -fno-pic -static -fno-builtin -fno-strict-aliasing -Wall -Werror -I. -iquote ../   -c -o ps.o ps.c
+arm-none-eabi-ld -L. -N -e main -Ttext 0 -o _ps ps.o ulib.o usys.o printf.o umalloc.o  -L ../ /usr/lib/gcc/arm-none-eabi/13.2.1/libgcc.a
+arm-none-eabi-objdump -S _ps > ps.asm
+arm-none-eabi-objdump -t _ps | sed '1,/SYMBOL TABLE/d; s/ .* / /; /^$/d' > ps.sym
+arm-none-eabi-gcc -march=armv6 -fno-pic -static -fno-builtin -fno-strict-aliasing -Wall -Werror -I. -iquote ../   -c -o testtickets.o testtickets.c
+arm-none-eabi-ld -L. -N -e main -Ttext 0 -o _testtickets testtickets.o ulib.o usys.o printf.o umalloc.o  -L ../ /usr/lib/gcc/arm-none-eabi/13.2.1/libgcc.a
+arm-none-eabi-objdump -S _testtickets > testtickets.asm
+arm-none-eabi-objdump -t _testtickets | sed '1,/SYMBOL TABLE/d; s/ .* / /; /^$/d' > testtickets.sym
+arm-none-eabi-gcc -march=armv6 -fno-pic -static -fno-builtin -fno-strict-aliasing -Wall -Werror -I. -iquote ../   -c -o lotterytest.o lotterytest.c
+arm-none-eabi-ld -L. -N -e main -Ttext 0 -o _lotterytest lotterytest.o ulib.o usys.o printf.o umalloc.o  -L ../ /usr/lib/gcc/arm-none-eabi/13.2.1/libgcc.a
+arm-none-eabi-objdump -S _lotterytest > lotterytest.asm
+arm-none-eabi-objdump -t _lotterytest | sed '1,/SYMBOL TABLE/d; s/ .* / /; /^$/d' > lotterytest.sym
+arm-none-eabi-gcc -march=armv6 -fno-pic -static -fno-builtin -fno-strict-aliasing -Wall -Werror -I. -iquote ../   -c -o pagetest.o pagetest.c
+arm-none-eabi-ld -L. -N -e main -Ttext 0 -o _pagetest pagetest.o ulib.o usys.o printf.o umalloc.o  -L ../ /usr/lib/gcc/arm-none-eabi/13.2.1/libgcc.a
+arm-none-eabi-objdump -S _pagetest > pagetest.asm
+arm-none-eabi-objdump -t _pagetest | sed '1,/SYMBOL TABLE/d; s/ .* / /; /^$/d' > pagetest.sym
+arm-none-eabi-gcc -march=armv6 -fno-pic -static -fno-builtin -fno-strict-aliasing -Wall -Werror -I. -iquote ../   -c -o test.o test.c
+arm-none-eabi-ld -L. -N -e main -Ttext 0 -o _test test.o ulib.o usys.o printf.o umalloc.o  -L ../ /usr/lib/gcc/arm-none-eabi/13.2.1/libgcc.a
+arm-none-eabi-objdump -S _test > test.asm
+arm-none-eabi-objdump -t _test | sed '1,/SYMBOL TABLE/d; s/ .* / /; /^$/d' > test.sym
+arm-none-eabi-gcc -march=armv6 -fno-pic -static -fno-builtin -fno-strict-aliasing -Wall -Werror -I. -iquote ../   -c -o t_barrier.o t_barrier.c
+arm-none-eabi-ld -L. -N -e main -Ttext 0 -o _t_barrier t_barrier.o ulib.o usys.o printf.o umalloc.o  -L ../ /usr/lib/gcc/arm-none-eabi/13.2.1/libgcc.a
+arm-none-eabi-objdump -S _t_barrier > t_barrier.asm
+arm-none-eabi-objdump -t _t_barrier | sed '1,/SYMBOL TABLE/d; s/ .* / /; /^$/d' > t_barrier.sym
+arm-none-eabi-gcc -march=armv6 -fno-pic -static -fno-builtin -fno-strict-aliasing -Wall -Werror -I. -iquote ../   -c -o t_l_cv1.o t_l_cv1.c
+arm-none-eabi-ld -L. -N -e main -Ttext 0 -o _t_l_cv1 t_l_cv1.o ulib.o usys.o printf.o umalloc.o  -L ../ /usr/lib/gcc/arm-none-eabi/13.2.1/libgcc.a
+arm-none-eabi-objdump -S _t_l_cv1 > t_l_cv1.asm
+arm-none-eabi-objdump -t _t_l_cv1 | sed '1,/SYMBOL TABLE/d; s/ .* / /; /^$/d' > t_l_cv1.sym
+arm-none-eabi-gcc -march=armv6 -fno-pic -static -fno-builtin -fno-strict-aliasing -Wall -Werror -I. -iquote ../   -c -o t_l_cv2.o t_l_cv2.c
+arm-none-eabi-ld -L. -N -e main -Ttext 0 -o _t_l_cv2 t_l_cv2.o ulib.o usys.o printf.o umalloc.o  -L ../ /usr/lib/gcc/arm-none-eabi/13.2.1/libgcc.a
+arm-none-eabi-objdump -S _t_l_cv2 > t_l_cv2.asm
+arm-none-eabi-objdump -t _t_l_cv2 | sed '1,/SYMBOL TABLE/d; s/ .* / /; /^$/d' > t_l_cv2.sym
+arm-none-eabi-gcc -march=armv6 -fno-pic -static -fno-builtin -fno-strict-aliasing -Wall -Werror -I. -iquote ../   -c -o t_lock.o t_lock.c
+arm-none-eabi-ld -L. -N -e main -Ttext 0 -o _t_lock t_lock.o ulib.o usys.o printf.o umalloc.o  -L ../ /usr/lib/gcc/arm-none-eabi/13.2.1/libgcc.a
+arm-none-eabi-objdump -S _t_lock > t_lock.asm
+arm-none-eabi-objdump -t _t_lock | sed '1,/SYMBOL TABLE/d; s/ .* / /; /^$/d' > t_lock.sym
+arm-none-eabi-gcc -march=armv6 -fno-pic -static -fno-builtin -fno-strict-aliasing -Wall -Werror -I. -iquote ../   -c -o t_sem1.o t_sem1.c
+arm-none-eabi-ld -L. -N -e main -Ttext 0 -o _t_sem1 t_sem1.o ulib.o usys.o printf.o umalloc.o  -L ../ /usr/lib/gcc/arm-none-eabi/13.2.1/libgcc.a
+arm-none-eabi-objdump -S _t_sem1 > t_sem1.asm
+arm-none-eabi-objdump -t _t_sem1 | sed '1,/SYMBOL TABLE/d; s/ .* / /; /^$/d' > t_sem1.sym
+arm-none-eabi-gcc -march=armv6 -fno-pic -static -fno-builtin -fno-strict-aliasing -Wall -Werror -I. -iquote ../   -c -o t_sem2.o t_sem2.c
+arm-none-eabi-ld -L. -N -e main -Ttext 0 -o _t_sem2 t_sem2.o ulib.o usys.o printf.o umalloc.o  -L ../ /usr/lib/gcc/arm-none-eabi/13.2.1/libgcc.a
+arm-none-eabi-objdump -S _t_sem2 > t_sem2.asm
+arm-none-eabi-objdump -t _t_sem2 | sed '1,/SYMBOL TABLE/d; s/ .* / /; /^$/d' > t_sem2.sym
+arm-none-eabi-gcc -march=armv6 -fno-pic -static -fno-builtin -fno-strict-aliasing -Wall -Werror -I. -iquote ../   -c -o t_sleepwake.o t_sleepwake.c
+arm-none-eabi-ld -L. -N -e main -Ttext 0 -o _t_sleepwake t_sleepwake.o ulib.o usys.o printf.o umalloc.o  -L ../ /usr/lib/gcc/arm-none-eabi/13.2.1/libgcc.a
+arm-none-eabi-objdump -S _t_sleepwake > t_sleepwake.asm
+arm-none-eabi-objdump -t _t_sleepwake | sed '1,/SYMBOL TABLE/d; s/ .* / /; /^$/d' > t_sleepwake.sym
+arm-none-eabi-gcc -march=armv6 -fno-pic -static -fno-builtin -fno-strict-aliasing -Wall -Werror -I. -iquote ../   -c -o bigfile.o bigfile.c
+arm-none-eabi-ld -L. -N -e main -Ttext 0 -o _bigfile bigfile.o ulib.o usys.o printf.o umalloc.o  -L ../ /usr/lib/gcc/arm-none-eabi/13.2.1/libgcc.a
+arm-none-eabi-objdump -S _bigfile > bigfile.asm
+arm-none-eabi-objdump -t _bigfile | sed '1,/SYMBOL TABLE/d; s/ .* / /; /^$/d' > bigfile.sym
+arm-none-eabi-gcc -march=armv6 -fno-pic -static -fno-builtin -fno-strict-aliasing -Wall -Werror -I. -iquote ../   -c -o t_threads.o t_threads.c
+arm-none-eabi-ld -L. -N -e main -Ttext 0 -o _t_threads t_threads.o ulib.o usys.o printf.o umalloc.o  -L ../ /usr/lib/gcc/arm-none-eabi/13.2.1/libgcc.a
+arm-none-eabi-objdump -S _t_threads > t_threads.asm
+arm-none-eabi-objdump -t _t_threads | sed '1,/SYMBOL TABLE/d; s/ .* / /; /^$/d' > t_threads.sym
+arm-none-eabi-gcc -march=armv6 -fno-pic -static -fno-builtin -fno-strict-aliasing -Wall -Werror -I. -iquote ../   -c -o t_waitpid.o t_waitpid.c
+arm-none-eabi-ld -L. -N -e main -Ttext 0 -o _t_waitpid t_waitpid.o ulib.o usys.o printf.o umalloc.o  -L ../ /usr/lib/gcc/arm-none-eabi/13.2.1/libgcc.a
+arm-none-eabi-objdump -S _t_waitpid > t_waitpid.asm
+arm-none-eabi-objdump -t _t_waitpid | sed '1,/SYMBOL TABLE/d; s/ .* / /; /^$/d' > t_waitpid.sym
+Building filesystem image...
+-rwxrwxrwx 1 dhrut dhrut 12K Nov 12 12:13 _init
+-rwxrwxrwx 1 dhrut dhrut 18K Nov 12 12:14 _sh
+../tools/mkfs ../build/fs.img _cat _echo _grep _init _kill _ln _ls _mkdir _rm _sh _stressfs _usertests _wc _zombie _uptime _pause _ps _testtickets _lotterytest _pagetest _test _t_barrier _t_l_cv1 _t_l_cv2 _t_lock _t_sem1 _t_sem2 _t_sleepwake _bigfile _t_threads _t_waitpid 
+used 34 (bit 5 ninode 26) free 34 log 10 total 20000
+balloc: first 34 blocks have been allocated
+balloc: write bitmap block at sector 29
+Filesystem image created successfully
+rm testtickets.o pause.o echo.o lotterytest.o t_l_cv1.o t_sem2.o cat.o wc.o ps.o t_sleepwake.o t_l_cv2.o mkdir.o init.o usertests.o t_barrier.o t_waitpid.o stressfs.o bigfile.o t_lock.o kill.o sh.o pagetest.o uptime.o test.o rm.o t_sem1.o ls.o grep.o ln.o t_threads.o zombie.o
+make[1]: Leaving directory '/mnt/c/Users/dhrut/Downloads/programming-assignment-5-pathos/OS/usr'
+cp -f build/initcode initcode
+cp -f build/fs.img fs.img
+  LINK     kernel.elf
+arm-none-eabi-objdump -S kernel.elf > kernel.asm
+arm-none-eabi-objdump -t kernel.elf | sed '1,/SYMBOL TABLE/d; s/ .* / /; /^$/d' > kernel.sym
+rm -f initcode fs.img
+[H[2J[3JPress Ctrl-A and then X to terminate QEMU session
+
+qemu-system-arm -M versatilepb -m 128 -cpu arm1176  -nographic -kernel kernel.elf
+[W][07973.770398] pw.conf      | [          conf.c: 1031 try_load_conf()] can't load config client.conf: No such file or directory
+[E][07973.771163] pw.conf      | [          conf.c: 1060 pw_conf_load_conf_for_context()] can't load config client.conf: No such file or directory
+pulseaudio: set_sink_input_volume() failed
+pulseaudio: Reason: Invalid argument
+pulseaudio: set_sink_input_mute() failed
+pulseaudio: Reason: Invalid argument
+starting xv6 for ARM...
+QEMU: Terminated
+
